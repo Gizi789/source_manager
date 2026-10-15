@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Universal Source Provider</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: #fff; padding: 20px; }
+        .card { background: #1e1e1e; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        h1 { margin-top: 0; font-size: 1.5rem; }
+        h2 { margin-top: 0; font-size: 1.2rem; border-bottom: 1px solid #333; padding-bottom: 8px; }
+        .status { color: #4caf50; font-weight: bold; }
+        input[type="text"] { width: 100%; padding: 10px; margin-top: 10px; background: #2d2d2d; border: 1px solid #333; color: white; border-radius: 4px; box-sizing: border-box;}
+        button { background: #0078D7; color: white; border: none; padding: 10px 15px; margin-top: 10px; cursor: pointer; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; }
+        button:hover { background: #005A9E; }
+        button:disabled { background: #555; cursor: not-allowed; }
+        ul { padding-left: 0; word-break: break-all; list-style: none; margin: 15px 0 0 0; }
+        li { margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; background: #252525; padding: 10px; border-radius: 4px; }
+        .source-url { word-break: break-all; flex: 1; }
+        .btn-remove { background: #d32f2f; padding: 4px 8px; margin-top: 0; font-size: 12px; margin-left: 10px; }
+        .btn-remove:hover { background: #b71c1c; }
+        .error { color: #ff5252; margin-top: 10px; font-size: 14px; }
+        .actions-row { display: flex; gap: 10px; align-items: center; }
+        
+        .search-results { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+        .result-item { background: #2a2a2a; padding: 12px; border-radius: 6px; border-left: 4px solid #0078D7; }
+        .result-title { font-weight: bold; font-size: 1.1rem; margin-bottom: 4px; }
+        .result-meta { font-size: 0.9rem; color: #aaa; margin-bottom: 8px; }
+        .result-link { display: inline-block; background: #333; color: #4caf50; padding: 4px 10px; border-radius: 4px; text-decoration: none; font-size: 0.9rem; }
+        .result-link:hover { background: #444; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Universal Source Provider</h1>
+        <p>Estado del servicio: <span class="status">En línea (Puerto 45000)</span></p>
+        <p>Este módulo independiente lee listas de juegos de internet o archivos locales y las expone como fuentes.</p>
+    </div>
+
+    <div class="card">
+        <h2>Buscar Juego</h2>
+        <p>Busca juegos directamente en los catálogos agregados:</p>
+        <div class="actions-row">
+            <input type="text" id="search-input" placeholder="Nombre del juego (ej: Hollow Knight)" style="margin-top: 0;">
+            <button id="search-btn" style="margin-top: 0;">Buscar</button>
+        </div>
+        <div id="search-results" class="search-results"></div>
+    </div>
+
+    <div class="card">
+        <h2>Fuentes Comunitarias (JSON)</h2>
+        <p>Añade URLs de catálogos web o elige archivos `.json` locales de tu disco:</p>
+        <ul id="sources-list">
+            <li>Cargando...</li>
+        </ul>
+        <input type="text" id="new-source" placeholder="URL web o ruta de archivo local (ej: C:\mis-juegos.json)">
+        
+        <div class="actions-row">
+            <button id="add-btn">Añadir URL / Ruta</button>
+            <button id="browse-btn" style="background: #4caf50;">Examinar Archivo Local...</button>
+        </div>
+        <div id="error-msg" class="error"></div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        // Search logic
+        document.getElementById('search-btn').onclick = async () => {
+            const query = document.getElementById('search-input').value.trim();
+            const resultsContainer = document.getElementById('search-results');
+            const btn = document.getElementById('search-btn');
+            
+            if (!query) return;
+
+            btn.disabled = true;
+            btn.textContent = 'Buscando...';
+            resultsContainer.innerHTML = '<i>Buscando...</i>';
+
+            try {
+                const results = await ipcRenderer.invoke('search-games', query);
+                resultsContainer.innerHTML = '';
+                
+                if (results.length === 0) {
+                    resultsContainer.innerHTML = '<i>No se encontraron resultados para esta búsqueda.</i>';
+                    return;
+                }
+
+                results.forEach(res => {
+                    const div = document.createElement('div');
+                    div.className = 'result-item';
+                    
+                    const title = document.createElement('div');
+                    title.className = 'result-title';
+                    title.textContent = res.title;
+                    
+                    const meta = document.createElement('div');
+                    meta.className = 'result-meta';
+                    meta.textContent = `${res.size || 'Tamaño desconocido'} | Fuente: ${res.source}`;
+                    
+                    const link = document.createElement('a');
+                    link.className = 'result-link';
+                    link.href = res.url;
+                    link.textContent = 'Copiar Enlace / Abrir';
+                    link.onclick = async (e) => {
+    e.preventDefault();
+    if (link.textContent.includes('Resolviendo')) return;
+    
+    link.textContent = 'Resolviendo enlace directo...';
+    
+    try {
+        const resolvedUrl = await ipcRenderer.invoke('resolve-link', res.url);
+        navigator.clipboard.writeText(resolvedUrl);
+        link.textContent = '¡Enlace Directo Copiado!';
+    } catch (err) {
+        navigator.clipboard.writeText(res.url);
+        link.textContent = '¡Enlace original copiado! (Fallo al resolver)';
+    }
+    
+    setTimeout(() => link.textContent = 'Copiar Enlace Directo', 3000);
+};
+
+div.appendChild(title);
+                    div.appendChild(meta);
+                    div.appendChild(link);
+                    resultsContainer.appendChild(div);
+                });
+            } catch (err) {
+                resultsContainer.innerHTML = `<span class="error">Error en la búsqueda: ${err.message}</span>`;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Buscar';
+            }
+        };
+
+        // Trigger search on enter
+        document.getElementById('search-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                document.getElementById('search-btn').click();
+            }
+        });
+
+        // Sources logic
+        async function loadSources() {
+            const list = document.getElementById('sources-list');
+            const sources = await ipcRenderer.invoke('get-sources');
+            list.innerHTML = '';
+            if (sources.length === 0) {
+                list.innerHTML = '<li>No hay fuentes configuradas.</li>';
+                return;
+            }
+            sources.forEach(url => {
+                const li = document.createElement('li');
+                
+                const span = document.createElement('span');
+                span.className = 'source-url';
+                span.textContent = url;
+                
+                const rmBtn = document.createElement('button');
+                rmBtn.textContent = 'Eliminar';
+                rmBtn.className = 'btn-remove';
+                rmBtn.onclick = async () => {
+                    rmBtn.disabled = true;
+                    rmBtn.textContent = 'Eliminando...';
+                    await ipcRenderer.invoke('remove-source', url);
+                    loadSources();
+                };
+
+                li.appendChild(span);
+                li.appendChild(rmBtn);
+                list.appendChild(li);
+            });
+        }
+
+        async function submitSource(url) {
+            const btn = document.getElementById('add-btn');
+            const err = document.getElementById('error-msg');
+            err.textContent = '';
+            
+            btn.disabled = true;
+            btn.textContent = 'Validando...';
+
+            try {
+                await ipcRenderer.invoke('add-source', url);
+                document.getElementById('new-source').value = '';
+                loadSources();
+            } catch (error) {
+                err.textContent = error.message.replace('Error: ', 'Error: ');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Añadir URL / Ruta';
+            }
+        }
+
+        document.getElementById('add-btn').onclick = () => {
+            const url = document.getElementById('new-source').value.trim();
+            if (url) submitSource(url);
+        };
+
+        document.getElementById('browse-btn').onclick = async () => {
+            const paths = await ipcRenderer.invoke('dialog-open-file');
+            if (paths && paths.length > 0) {
+                submitSource(paths[0]);
+            }
+        };
+
+        loadSources();
+    </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+node_modules/
+dist/
+backups/
+*.pre-*
+execution-profiles.json
+installer/bin/
+installer/obj/
+installer/plugin-payload.zip
+*.log

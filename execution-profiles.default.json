@@ -1,0 +1,19 @@
+{
+  "games": {},
+  "sources": {},
+  "default": {
+    "version": 1,
+    "name": "Perfil opcional del proveedor",
+    "id": "provider-default",
+    "archivePasswords": ["online-fix.me"],
+    "beforePlay": [
+      {
+        "type": "ini-set",
+        "glob": "OnlineFix.ini",
+        "section": "Hashes",
+        "key": "1337",
+        "value": "defa34f9d4e76c16eeb47f057f337934d4e47da373fd5dced397e2db05370865c9a75a0314d14d7fc15f1da4cab85f769ea958825210af06be6c4e253abeaf73"
+      }
+    ]
+  }
+}
