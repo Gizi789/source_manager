@@ -1,35 +1,50 @@
 {
-  "name": "ga-torrent-plugin",
-  "version": "1.0.0",
-  "description": "Torrent Source Provider Plugin for Game Access",
-  "main": "main.js",
-  "scripts": {
-    "start": "electron .",
-    "build": "electron-builder",
-    "test": "jest"
-  },
-  "dependencies": {
-    "axios": "^1.6.0",
-    "cors": "^2.8.5",
-    "electron-log": "^5.4.4",
-    "electron-updater": "^6.8.9",
-    "express": "^4.18.2",
-    "fuzzball": "^2.2.6"
-  },
-  "devDependencies": {
-    "electron": "^28.0.0",
-    "electron-builder": "^26.15.3",
-    "jest": "^30.5.2"
-  },
-  "build": {
-    "appId": "com.gameaccess.torrentplugin",
-    "productName": "Game Access Torrent Provider",
-    "win": {
-      "target": [
-        "nsis",
-        "portable"
-      ],
-      "icon": "build/icon.ico"
-    }
-  }
+    "name":  "ga-torrent-plugin",
+    "version":  "1.0.0",
+    "description":  "Torrent Source Provider Plugin for Game Access",
+    "main":  "main.js",
+    "scripts":  {
+                    "start":  "electron .",
+                    "build":  "electron-builder",
+                    "test":  "jest"
+                },
+    "dependencies":  {
+                         "axios":  "^1.6.0",
+                         "cors":  "^2.8.5",
+                         "electron-log":  "^5.4.4",
+                         "electron-updater":  "^6.8.9",
+                         "express":  "^4.18.2",
+                         "fuzzball":  "^2.2.6"
+                     },
+    "devDependencies":  {
+                            "electron":  "^28.0.0",
+                            "electron-builder":  "^26.15.3",
+                            "jest":  "^30.5.2"
+                        },
+    "build":  {
+                  "appId":  "com.gameaccess.torrentplugin",
+                  "productName":  "Game Access Torrent Provider",
+                  "win":  {
+                              "target":  [
+                                             "nsis",
+                                             "portable"
+                                         ],
+                              "icon":  "build/icon.ico"
+                          },
+                  "files":  [
+                                "main.js",
+                                "links.js",
+                                "matcher.js",
+                                "feed-cache.js",
+                                "source-state.js",
+                                "source-ranking.js",
+                                "seeds.js",
+                                "gofile.js",
+                                "instance.js",
+                                "instance-processes.ps1",
+                                "execution-profiles.js",
+                                "index.html",
+                                "package.json"
+                            ]
+              }
 }

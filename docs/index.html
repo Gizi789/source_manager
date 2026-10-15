@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source Manager - plugin para Game Access</title>
+<style>
+  :root { color-scheme: dark; --bg:#0b0d12; --card:#141821; --line:#252b38; --text:#e8ebf2; --muted:#9aa3b5; --accent:#ff8a1f; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:16px/1.55 system-ui, "Segoe UI", sans-serif; }
+  main { max-width: 680px; margin: 0 auto; padding: 48px 16px 64px; }
+  h1 { font-size: 1.8rem; margin: 0 0 8px; }
+  p { color: var(--muted); }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:20px; margin:20px 0; }
+  .button { display:inline-block; background:var(--accent); color:#1a0f00; font-weight:700; text-decoration:none; padding:12px 20px; border-radius:10px; }
+  .button:focus-visible, a:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+  .secondary { background:transparent; color:var(--text); border:1px solid var(--line); }
+  code { background:#0f131b; padding:2px 6px; border-radius:6px; word-break: break-all; }
+  ul { color: var(--muted); padding-left: 20px; }
+  small { color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Source Manager</h1>
+  <p>Plugin opcional para Game Access. Agrega fuentes de descarga a tu biblioteca. Es software libre de terceros y no tiene relación con el proyecto Game Access.</p>
+
+  <div class="card">
+    <h2>Instalar con un clic</h2>
+    <p>Con Game Access instalado, este botón lo abre y te pide confirmación antes de instalar el plugin. Después tenés que volver a abrir Game Access.</p>
+    <p><a class="button" id="install" href="gameaccess://install-plugin?url=https%3A%2F%2Fgithub.com%2FGizi789%2Fsource_manager%2Freleases%2Fdownload%2Fv1.0.0%2Fga-source-manager-plugin.zip&amp;sha256=fd13f3433cd72ec833887dd0fce810179c1e1eb3b6110365356eece4454d16be&amp;name=Source+Manager">Instalar en Game Access</a></p>
+    <small>Si no pasa nada, Game Access todavía no está instalado o necesita abrirse una vez para registrar el enlace.</small>
+  </div>
+
+  <div class="card">
+    <h2>Instalación manual</h2>
+    <p>Descargá el instalador desde la página de <a href="https://github.com/Gizi789/source_manager/releases" style="color:var(--accent)">Releases</a> y ejecutalo. Windows puede mostrar un aviso porque el archivo no está firmado.</p>
+  </div>
+
+  <div class="card">
+    <h2>Antes de instalar</h2>
+    <ul>
+      <li>Un plugin es un programa que Game Access ejecuta en tu equipo. Instalalo solo si confiás en quien lo publica.</li>
+      <li>El enlace verifica la firma SHA-256 del archivo: si no coincide, no se instala nada.</li>
+      <li>Vos elegís y sos responsable de las fuentes que agregues y de cumplir las leyes de tu país. Este software no aloja ni distribuye contenido con derechos de autor.</li>
+    </ul>
+    <small>SHA-256 del paquete: <code>fd13f3433cd72ec833887dd0fce810179c1e1eb3b6110365356eece4454d16be</code></small>
+  </div>
+</main>
+</body>
+</html>
